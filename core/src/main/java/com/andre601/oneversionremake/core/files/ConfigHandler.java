@@ -42,6 +42,9 @@ public class ConfigHandler{
     private final File path;
     
     private ConfigurationNode node = null;
+
+    private List<Integer> protocols;
+    private List<String> kickMsgs;
     
     public ConfigHandler(OneVersionRemake core, Path path){
         this.core = core;
@@ -50,41 +53,59 @@ public class ConfigHandler{
         this.config = new File(path.toFile(), "config.yml");
         this.path = path.toFile();
     }
-    
-    public boolean loadConfig(){
-        if(!path.isDirectory() && !path.mkdirs()){
+
+    private void loadSettings()
+    {
+        protocols = getIntList("Protocol", "Versions");
+        kickMsgs = getStringList(false, "Messages", "Kick");
+    }
+
+    public List<Integer> getProtocols()
+    {
+        return protocols;
+    }
+
+    public List<String> getKickMsgs()
+    {
+        return kickMsgs;
+    }
+
+    public boolean loadConfig() {
+        if (!path.isDirectory() && !path.mkdirs()) {
             logger.warn("Could not create folder for plugin!");
             return false;
         }
-        
-        if(!config.exists()){
-            try(InputStream is = core.getClass().getResourceAsStream("/config.yml")){
-                if(is == null){
+
+        if (!config.exists()) {
+            try (InputStream is = core.getClass().getResourceAsStream("/config.yml")) {
+                if (is == null) {
                     logger.warn("Unable to create config file! InputStream was null.");
                     return false;
                 }
-                
+
                 Files.copy(is, config.toPath());
-            }catch(IOException ex){
+            } catch (IOException ex) {
                 logger.warn("Unable to create config file!", ex);
                 return false;
             }
         }
-    
+
         YamlConfigurationLoader loader = YamlConfigurationLoader.builder()
                 .file(config)
                 .build();
-        
-        try{
+
+        try {
             node = loader.load();
-        }catch(IOException ex){
+        } catch (IOException ex) {
             logger.warn("There was an issue while attempting to load the config.", ex);
             return false;
         }
-        
+
+        loadSettings();
+
         return true;
     }
-    
+
     public boolean reload(){
         YamlConfigurationLoader loader = YamlConfigurationLoader.builder()
                 .file(config)
@@ -92,6 +113,7 @@ public class ConfigHandler{
         
         try{
             node = loader.load();
+            loadSettings();
             return true;
         }catch(IOException ex){
             logger.warn("There was an issue while attempting to reload the config", ex);

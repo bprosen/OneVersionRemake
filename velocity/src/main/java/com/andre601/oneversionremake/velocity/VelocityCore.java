@@ -28,7 +28,6 @@ import com.andre601.oneversionremake.core.interfaces.PluginCore;
 import com.andre601.oneversionremake.core.interfaces.ProxyLogger;
 import com.andre601.oneversionremake.velocity.commands.CmdOneVersionRemake;
 import com.andre601.oneversionremake.velocity.listener.VelocityLoginListener;
-import com.andre601.oneversionremake.velocity.listener.VelocityPingListener;
 import com.andre601.oneversionremake.velocity.logging.VelocityLogger;
 import com.google.inject.Inject;
 import com.velocitypowered.api.command.CommandMeta;
@@ -83,7 +82,6 @@ public class VelocityCore implements PluginCore{
     @Override
     public void loadEventListeners(){
         new VelocityLoginListener(this);
-        new VelocityPingListener(this);
     }
     
     @Override
